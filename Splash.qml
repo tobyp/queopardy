@@ -72,7 +72,7 @@ Rectangle {
                                 onClicked: {
                                     var player = ctxGame.get(model.index);
 
-                                    player.color = Colors.nextColor(this.color);
+                                    player.color = Colors.nextColor(player.color);
                                 }
                             }
                         }

@@ -64,6 +64,7 @@ signals:
     void joinableChanged(bool joinable);
     void openQuestionChanged(Question * openQuestion);
     void buzzerPlayerChanged(Player * buzzerPlayer);
+    void onPlayerJoined(Player * player);
 
 public slots:
     void setBoard(Board * board);

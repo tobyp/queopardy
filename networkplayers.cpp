@@ -52,6 +52,9 @@ private slots:
         else if (msg == "buzz") {
             onCommandBuzz();
         }
+        else if (msg == "nextColor") {
+            onCommandNextColor();
+        }
         else {
             send("error unrecognized command, try 'hello', 'color', or 'buzz'");
         }
@@ -147,6 +150,16 @@ private:
         emit nameChanged(name);
     }
 
+    void onCommandNextColor() {
+        if (!m_player) {
+            send("error you're not registered yet, send a 'hello' command first");
+            return;
+        }
+
+        m_player->setColor(m_game->nextFreePlayerColor());
+        send("ok your color was changed!");
+    }
+
 signals:
     void nameChanged(const QString &name);
     void gameChanged(Game * m_game);
@@ -232,18 +245,22 @@ void NetworkPlayers::Private::onClientNameChanged(const QString &name)
             q->game()->removePlayer(client->m_player);
         }
         client->m_player = existingPlayer;
+        client->send("ok you've joined the game!");
+        emit game->onPlayerJoined(client->m_player);
         qCDebug(logNetworkPlayers) << "Connection" << client->connectionString() << "is now controlling" << client->m_player->name();
     }
     else if (client->m_player) {  // target is self
         QString oldName = client->m_player->name();
         client->m_player->setName(name);
+        client->send("ok name changed");
         qCDebug(logNetworkPlayers) << "Player" << oldName << "is now" << name;
     }
     else {  // target is a new player
         Player * newPlayer = q->game()->addPlayer(name, game->nextFreePlayerColor());
         if (newPlayer) {
             client->m_player = newPlayer;
-            client->m_player = existingPlayer;
+            emit game->onPlayerJoined(client->m_player);
+            client->send("welcome");
             qCDebug(logNetworkPlayers) << "Connection" << client->connectionString() << "is now controlling" << client->m_player->name();
         }
         else {
