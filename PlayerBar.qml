@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.11
 import com.queopardy 1.0
 import "Colors.js" as C
 
-RowLayout {
+Flow {
     id: players;
 
     spacing: 10;

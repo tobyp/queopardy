@@ -58,8 +58,9 @@ ColumnLayout {
     }
 
     PlayerBar {
-        id: playerBar;
-        Layout.alignment: Qt.AlignHCenter;
+        id: playerBar
+        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
 
         model: game
     }
