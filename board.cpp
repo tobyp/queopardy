@@ -63,12 +63,14 @@ void Board::loadJson(const QJsonArray &catArray, Game *game)
             }
             for (QJsonValue paValue : questionObject.value("playerAnswers").toArray()) {
                 QJsonObject paObj = paValue.toObject();
-                QString playerName = paObj.value("player").toString();
-                if (playerName.isEmpty()) {
-                    int blub=4;
+                QJsonValue playerValue = paObj.value("player");
+                Player * player = nullptr;
+                if (playerValue.isString()) {
+                    QString playerName = paObj.value("player").toString();
+                    player = game->getByName(playerName);
                 }
                 int score = paObj.value("score").toInt();
-                question->addPlayerAnswer(game->getByName(playerName), score);
+                question->addPlayerAnswer(player, score);
             }
             cat->addQuestion(question);
         }
@@ -95,10 +97,6 @@ QJsonArray Board::saveJson()
                     {"score", pa->score()},
                 };
                 paArray.append(paObj);
-            }
-
-            if (question->revealed()) {
-                int blub=4;
             }
 
             QJsonObject qObj = {

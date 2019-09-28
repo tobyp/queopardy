@@ -16,3 +16,12 @@ const COLORS = [
 function nextColor(color) {
     return COLORS[(COLORS.indexOf(color) + 1) % COLORS.length];
 }
+
+function textColorFor(color) {
+    if (color.value < 100) {
+        return Qt.lighter(color, 3.0);
+    }
+    else {
+        return Qt.darker(color, 3.0);
+    }
+}

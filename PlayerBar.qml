@@ -1,6 +1,7 @@
 import QtQuick 2.13
 import QtQuick.Layouts 1.11
 import com.queopardy 1.0
+import "Colors.js" as C
 
 RowLayout {
     id: players;
@@ -24,7 +25,7 @@ RowLayout {
 
             Text {
                 text: player.name + ": " + player.score;
-                color: Qt.darker(player.color, 3.0);
+                color: C.textColorFor(player.color);
                 font.pointSize: 20;
                 padding: 5;
                 leftPadding: 10;

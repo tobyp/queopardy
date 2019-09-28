@@ -68,14 +68,14 @@ Window {
                 id: questionDisplay;
 
                 onComplete: {
-                    ctxGame.setState(Game.UNBUZZABLE);
+                    ctxGame.openQuestion = null;
                     root.pop();
                 }
 
                 focus: true
                 Keys.enabled: true
                 Keys.onPressed: {
-                    if (!ctxGame.state === Game.BUZZABLE) return;
+                    if (ctxGame.state !== Game.QUESTION) return;
 
                     var buzzerIndex = -1;
                     if (event.key === Qt.Key_A) {
@@ -102,10 +102,6 @@ Window {
                     else if (event.key === Qt.Key_H) {
                         buzzerIndex = 7;
                     }
-                    else if (event.key === Qt.Key_Escape) {
-                        root.pop();
-                        event.accepted = true;
-                    }
 
                     if (buzzerIndex > -1 && buzzerIndex < ctxGame.count) {
                         event.accepted = true;
@@ -123,7 +119,7 @@ Window {
 
                 onQuestionSelected: function(question) {
                     root.push(questionComponent, {question: question});
-                    ctxGame.setState(Game.BUZZABLE);
+                    ctxGame.openQuestion = question;
                 }
             }
         }
@@ -132,7 +128,7 @@ Window {
             game: ctxGame
             onReady: function() {
                 root.push(boardComponent);
-                ctxGame.setState(Game.UNBUZZABLE);
+                ctxGame.joinable = false;
             }
         }
 

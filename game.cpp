@@ -20,28 +20,26 @@ public:
     Private(Game *q)
     : q(q)
     , board(new Board(q))
-    , state(GameState::LOBBY)
-    , minPlayers(2)
-    , maxPlayers(4)
     {
         connect(board, &Board::boardStateChanged, this, &Game::Private::saveBackup);
     }
-
-    QColor nextFreePlayerColor();
 
     Game *q;
 
     QString baseFileName;
     Board * board;
-    GameState state;
-    int minPlayers;
-    int maxPlayers;
+    int minPlayers = 2;
+    int maxPlayers = 8;
     QList<Player *> players;
-    bool loading = false;
+    Player * buzzerPlayer = nullptr;
+    Question * openQuestion = nullptr;
+    bool joinable = true;
+    bool loading = false;  //when this is true, disable the backup saving logic
 
 public slots:
     void saveBackup();
     void onPlayerColorChanged(QColor const& color);
+    void onPlayerNameChanged(QString const& name);
 };
 
 Game::Game(QObject *parent) : QAbstractListModel(parent), d(new Private(this))
@@ -161,17 +159,6 @@ void Game::setBoard(Board *board)
     emit boardChanged(d->board);
 }
 
-void Game::setState(Game::GameState state)
-{
-    if (d->state == state) {
-        return;
-    }
-
-    d->state = state;
-
-    emit minPlayersChanged(state);
-}
-
 void Game::setMinPlayers(int minPlayers)
 {
     if (d->minPlayers == minPlayers) {
@@ -199,6 +186,39 @@ void Game::setMaxPlayers(int maxPlayers)
     emit maxPlayersChanged(maxPlayers);
 }
 
+void Game::setBuzzerPlayer(Player *buzzerPlayer)
+{
+    if (d->buzzerPlayer == buzzerPlayer)
+        return;
+
+    d->buzzerPlayer = buzzerPlayer;
+    emit buzzerPlayerChanged(d->buzzerPlayer);
+}
+
+void Game::setJoinable(bool joinable)
+{
+    if (d->joinable == joinable)
+        return;
+
+    d->joinable = joinable;
+    emit joinableChanged(d->joinable);
+}
+
+void Game::setOpenQuestion(Question *openQuestion)
+{
+    if (d->openQuestion == openQuestion)
+        return;
+
+    if (d->openQuestion == nullptr) { // close buzzer if still open before opening this question
+        setBuzzerPlayer(nullptr);
+    }
+    d->openQuestion = openQuestion;
+    if (d->openQuestion == nullptr) { // close buzzer if still open after closing this question
+        setBuzzerPlayer(nullptr);
+    }
+    emit openQuestionChanged(d->openQuestion);
+}
+
 int Game::maxPlayers() const
 {
     return d->maxPlayers;
@@ -223,12 +243,7 @@ Player *Game::getByName(const QString &name)
     return nullptr;
 }
 
-Player *Game::addPlayerAutocolor(const QString &name, bool createPlayer)
-{
-    return addPlayer(name, d->nextFreePlayerColor(), createPlayer);
-}
-
-Player *Game::addPlayer(const QString &name, const QColor &color, bool createPlayer)
+Player *Game::addPlayer(const QString &name, const QColor &color)
 {
     for(Player *p : d->players) {
         if (p->name() == name) {
@@ -236,9 +251,10 @@ Player *Game::addPlayer(const QString &name, const QColor &color, bool createPla
         }
     }
 
-    if (!createPlayer) return nullptr;
+    if (!d->joinable) return nullptr;
 
     Player *player = new Player(name, color, this);
+    connect(player, &Player::nameChanged, d, &Game::Private::onPlayerNameChanged);
     connect(player, &Player::colorChanged, d, &Game::Private::onPlayerColorChanged);
 
     int pos = d->players.size();
@@ -263,9 +279,40 @@ void Game::removePlayer(Player *player)
     }
 }
 
-void Game::buzz(Player *player)
+bool Game::buzz(Player *player)
 {
-    emit playerBuzzed(player);
+    if (d->openQuestion == nullptr || d->buzzerPlayer != nullptr) {
+        return false;
+    }
+    d->buzzerPlayer = player;
+    emit buzzerPlayerChanged(d->buzzerPlayer);
+    return true;
+}
+
+QString Game::nextFreePlayerName()
+{
+    QString name;
+    for (int i=1; i<d->players.size() + 2; ++i) {
+        // https://gamedev.stackexchange.com/questions/46463/how-can-i-find-an-optimum-set-of-colors-for-10-players
+        name = QString("Player %1").arg(i);
+        if (std::find_if(d->players.cbegin(), d->players.cend(), [&name](Player *const p){ return p->name() == name; }) == d->players.cend()) {
+            break;
+        }
+    }
+    return name;
+}
+
+QColor Game::nextFreePlayerColor()
+{
+    QColor color;
+    for (int i=0; i<d->players.size() + 1; ++i) {
+        // https://gamedev.stackexchange.com/questions/46463/how-can-i-find-an-optimum-set-of-colors-for-10-players
+        color = QColor::fromHsvF(fmod(i * 0.618033988749895, 1.0), 0.5, 1.0);
+        if (std::find_if(d->players.cbegin(), d->players.cend(), [&color](Player *const p){ return p->color() == color; }) == d->players.cend()) {
+            break;
+        }
+    }
+    return color;
 }
 
 int Game::count() const
@@ -316,23 +363,19 @@ QVariant Game::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-Game::GameState Game::state() const
+bool Game::joinable() const
 {
-    return d->state;
+    return d->joinable;
 }
 
-QColor Game::Private::nextFreePlayerColor()
+Question *Game::openQuestion() const
 {
-    QColor color;
-    for (int i=0; i<players.size() + 1; ++i) {
-        // https://gamedev.stackexchange.com/questions/46463/how-can-i-find-an-optimum-set-of-colors-for-10-players
-        color = QColor::fromHsvF(fmod(i * 0.618033988749895, 1.0), 0.5, 1.0);
-//        color = QColor::fromRgb((i * 158) % 256, 127, 255);
-        if (std::find_if(players.cbegin(), players.cend(), [&color](Player *const p){ return p->color() == color; }) == players.cend()) {
-            break;
-        }
-    }
-    return color;
+    return d->openQuestion;
+}
+
+Player *Game::buzzerPlayer() const
+{
+    return d->buzzerPlayer;
 }
 
 void Game::Private::saveBackup()
@@ -347,10 +390,18 @@ void Game::Private::saveBackup()
 
 void Game::Private::onPlayerColorChanged(const QColor &color)
 {
-    Q_UNUSED(color);
+    Q_UNUSED(color)
     Player * player = qobject_cast<Player*>(sender());
     int idx = players.indexOf(player);
     emit q->dataChanged(q->index(idx), q->index(idx), {Role::ColorRole});
+}
+
+void Game::Private::onPlayerNameChanged(const QString &name)
+{
+    Q_UNUSED(name)
+    Player * player = qobject_cast<Player*>(sender());
+    int idx = players.indexOf(player);
+    emit q->dataChanged(q->index(idx), q->index(idx), {Role::NameRole});
 }
 
 #include "game.moc"

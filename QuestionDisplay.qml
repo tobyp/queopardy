@@ -2,6 +2,8 @@ import QtQuick 2.13
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.5
 import QtMultimedia 5.13
+import com.queopardy 1.0
+import "Colors.js" as C
 
 Rectangle {
     id: qDisplay;
@@ -12,9 +14,13 @@ Rectangle {
 
     Connections {
         target: ctxGame
-        onPlayerBuzzed: {
-            if (buzzer.player !== null) return;  //only buzz when open
-            buzzer.player = player;
+    }
+
+    function unbuzz(compl) {
+        ctxGame.buzzerPlayer = null;
+        if (compl) {
+            question.revealed = true;
+            complete();
         }
     }
 
@@ -22,10 +28,11 @@ Rectangle {
     Keys.enabled: true
     Keys.onPressed: {
         if (event.key === Qt.Key_Delete) {
-            question.revealed = true;
             qDisplay.question.addPlayerAnswer(null, 0);
-            buzzer.player = null;
-            qDisplay.complete();
+            unbuzz(true);
+        }
+        else if (event.key === Qt.Key_Escape) {
+            unbuzz(ctxGame.buzzerPlayer === null);
         }
     }
 
@@ -39,7 +46,7 @@ Rectangle {
         anchors.fill: parent;
         color: Qt.rgba(0, 0, 0, 0.5);
         z: 100;
-        visible: buzzer.player !== null;
+        visible: ctxGame.buzzerPlayer !== null;
 
         onVisibleChanged: {
             if (visible) {
@@ -58,16 +65,15 @@ Rectangle {
 
                 width: childrenRect.width;
                 height: childrenRect.height;
-                property var player: null;
-                color: player !== null ? player.color : "transparent";
+                color: ctxGame.buzzerPlayer !== null ? ctxGame.buzzerPlayer.color : "transparent";
 
                 ColumnLayout {
                     Text {
-                        color: buzzer.player !== null ? Qt.darker(buzzer.player.color, 3.0) : "black";
+                        color: ctxGame.buzzerPlayer !== null ? C.textColorFor(ctxGame.buzzerPlayer.color) : "white";
                         Layout.margins: 10;
                         Layout.alignment: Qt.AlignHCenter
                         font.pointSize: 20;
-                        text: buzzer.player !== null ? buzzer.player.name : "";
+                        text: ctxGame.buzzerPlayer !== null ? ctxGame.buzzerPlayer.name : "";
                     }
 
                     RowLayout {
@@ -77,39 +83,34 @@ Rectangle {
                         Button {
                             text: "Correct"
                             onClicked: {
-                                question.revealed = true;
-                                qDisplay.question.addPlayerAnswer(buzzer.player, qDisplay.question.points);
-                                buzzer.player = null;
-                                qDisplay.complete();
+                                qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, qDisplay.question.points);
+                                unbuzz(true);
                             }
                         }
                         Button {
                             text: "Incorrect"
                             onClicked: {
-                                qDisplay.question.addPlayerAnswer(buzzer.player, -qDisplay.question.points);
-                                buzzer.player = null;
+                                qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, -qDisplay.question.points);
+                                unbuzz(false);
                             }
                         }
                         Button {
                             text: "Fail"
                             onClicked: {
-                                question.revealed = true;
                                 qDisplay.question.addPlayerAnswer(null, 0);
-                                buzzer.player = null;
-                                qDisplay.complete();
+                                unbuzz(true);
                             }
                         }
                         Button {
                             text: "Unbuzz"
                             onClicked: {
-                                buzzer.player = null;
+                                unbuzz(false);
                             }
                         }
                         Button {
                             text: "Unclick"
                             onClicked: {
-                                buzzer.player = null;
-                                qDisplay.complete();
+                                unbuzz(true);
                             }
                         }
                     }

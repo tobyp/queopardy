@@ -4,3 +4,6 @@
 *.moc
 queopardy
 .qmake.stash
+moc_*.cpp
+qrc_qml.cpp
+moc_*.h
