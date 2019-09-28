@@ -1,0 +1,55 @@
+{
+	"title": "Informatik",
+	"categories": [
+		{
+			"label": "Image",
+			"questions": [
+				{"points": 100, "question": "[img]duck.jpg", "answer": "Answer"},
+				{"points": 200, "question": "[img]duck.jpg", "answer": "Answer"},
+				{"points": 300, "question": "[img]duck.jpg", "answer": "Answer"},
+				{"points": 400, "question": "[img]duck.jpg", "answer": "Answer"},
+				{"points": 500, "question": "[img]duck.jpg", "answer": "Answer"}
+			]
+		},
+		{
+			"label": "Short",
+			"questions": [
+				{"points": 100, "question": "Answer!", "answer": "Question?"},
+				{"points": 200, "question": "Answer!", "answer": "Question?"},
+				{"points": 300, "question": "Answer!", "answer": "Question?"},
+				{"points": 400, "question": "Answer!", "answer": "Question?"},
+				{"points": 500, "question": "Answer!", "answer": "Question?"}
+			]
+		},
+		{
+			"label": "Long",
+			"questions": [
+				{"points": 100, "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna.", "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna."},
+				{"points": 200, "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna.", "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna."},
+				{"points": 300, "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna.", "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna."},
+				{"points": 400, "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna.", "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna."},
+				{"points": 500, "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna.", "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim auctor ipsum, id mattis ex feugiat sed. Fusce ac mattis purus. Vestibulum vitae vehicula nibh, eu fringilla felis. Pellentesque ornare turpis et eros convallis, et blandit urna malesuada. Sed tincidunt sed neque vel laoreet. Curabitur malesuada, tortor id placerat egestas, ligula risus mattis enim, at varius nisl tellus a diam. Aliquam finibus, leo vel tempor aliquet, diam augue aliquam mi, nec fermentum leo libero vel magna."}
+			]
+		},
+		{
+			"label": "Monospace",
+			"questions": [
+				{"points": 100, "question": "Lorem Ipsum", "answer": "Whatever", "font": "RobotoMono-Regular.ttf"},
+				{"points": 200, "question": "Lorem Ipsum", "answer": "Whatever", "font": "RobotoMono-Regular.ttf"},
+				{"points": 300, "question": "Lorem Ipsum", "answer": "Whatever", "font": "RobotoMono-Regular.ttf"},
+				{"points": 400, "question": "Lorem Ipsum", "answer": "Whatever", "font": "RobotoMono-Regular.ttf"},
+				{"points": 500, "question": "Lorem Ipsum", "answer": "Whatever", "font": "RobotoMono-Regular.ttf"}
+			]
+		},
+		{
+			"label": "Emoji",
+			"questions": [
+				{"points": 100, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100},
+				{"points": 200, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100},
+				{"points": 300, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100},
+				{"points": 400, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100},
+				{"points": 500, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100}
+			]
+		}
+	]
+}

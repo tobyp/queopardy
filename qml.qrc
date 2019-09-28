@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>BoardView.qml</file>
+        <file>Tile.qml</file>
+        <file>QuestionDisplay.qml</file>
+        <file>PlayerBar.qml</file>
+        <file>Splash.qml</file>
+        <file>Colors.js</file>
+        <file>GamepadBuzzer.qml</file>
+        <file>think.mp3</file>
+    </qresource>
+</RCC>
