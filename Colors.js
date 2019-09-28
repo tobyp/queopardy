@@ -18,7 +18,10 @@ function nextColor(color) {
 }
 
 function textColorFor(color) {
-    if (color.value < 100) {
+    if (color.hsvValue < 0.1) {
+        return "white";
+    }
+    else if (color.hsvValue< 0.3) {
         return Qt.lighter(color, 3.0);
     }
     else {

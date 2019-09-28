@@ -25,7 +25,9 @@ RowLayout {
 
             Text {
                 text: player.name + ": " + player.score;
-                color: C.textColorFor(player.color);
+                color: {
+                    return C.textColorFor(player.color);
+                }
                 font.pointSize: 20;
                 padding: 5;
                 leftPadding: 10;

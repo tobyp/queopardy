@@ -16,11 +16,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    if (argc < 2) {
-        qInfo("usage: %s board.json", argv[0]);
-        return 1;
+    QString fileName = "board.json";
+    if (argc >= 2) {
+        fileName = argv[1];
     }
-    QString fileName = argv[1];
 
     QGuiApplication app(argc, argv);
 

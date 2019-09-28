@@ -1,6 +1,7 @@
 import QtQuick 2.13
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.5
+import "Colors.js" as C
 
 Flipable {
     id: flipable;
@@ -51,6 +52,7 @@ Flipable {
         anchors.fill: parent;
         property var winner: question.playerAnswers.length > 0 ? question.playerAnswers[question.playerAnswers.length - 1].player : null;
         color: winner ? winner.color : "gray";
+        id: tile
 
         MouseArea {
             anchors.fill: parent;
@@ -69,6 +71,7 @@ Flipable {
                 delegate: Text {
                     Layout.alignment: Qt.AlignHCenter
                     property var playerAnswer: model.modelData;
+                    color: C.textColorFor(tile.color)
                     text: {
                         if (playerAnswer.player !== null) {
                             return playerAnswer.player.name + " [" + playerAnswer.score + "]";
