@@ -52,7 +52,8 @@ Rectangle {
         GridLayout {
             anchors.fill: parent;
             Rectangle {
-                Layout.alignment: Qt.AlignCenter
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                Layout.bottomMargin: 10
                 id: buzzer;
 
                 width: childrenRect.width;
