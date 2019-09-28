@@ -235,6 +235,11 @@ Player *Game::get(int idx) const
     return player;
 }
 
+int Game::indexOf(Player *player) const
+{
+    return d->players.indexOf(player);
+}
+
 Player *Game::getByName(const QString &name)
 {
     for (auto p : d->players) {

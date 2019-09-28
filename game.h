@@ -36,6 +36,7 @@ public:
     void reset();
 
     Q_INVOKABLE Player *get(int idx) const;
+    Q_INVOKABLE int indexOf(Player *player) const;
     Player *getByName(QString const& name);
     Q_INVOKABLE Player * addPlayer(const QString &name, QColor const& color);
     Q_INVOKABLE void removePlayer(Player * player);
@@ -64,7 +65,7 @@ signals:
     void joinableChanged(bool joinable);
     void openQuestionChanged(Question * openQuestion);
     void buzzerPlayerChanged(Player * buzzerPlayer);
-    void onPlayerJoined(Player * player);
+    void playerJoined(Player * player);
 
 public slots:
     void setBoard(Board * board);

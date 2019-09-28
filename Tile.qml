@@ -13,6 +13,8 @@ Flipable {
 
     signal selected();
 
+    clip: true
+
     transform: Rotation {
         id: rotation
         origin.x: flipable.width/2

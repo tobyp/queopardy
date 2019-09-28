@@ -2,15 +2,20 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.5
+import QtMultimedia 5.13
 import QtGamepad 1.13
 import com.queopardy 1.0
 
 Window {
+    id: app
     visible: true;
     width: 640;
     height: 480;
     title: qsTr("Queopardy");
     color: "lightgray"
+
+//    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.WindowFullscreenButtonHint | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinMaxButtonsHint |            Qt.WindowCloseButtonHint | Qt.WindowFullscreenButtonHint
 
     NetworkPlayers {
         id: netPlayers
@@ -57,6 +62,47 @@ Window {
         }
     }
 
+    Connections {
+        target: ctxGame
+
+        function playerSound(player) {
+            if (player) {
+                var idx = ctxGame.indexOf(player);
+
+                playSound(idx);
+            }
+        }
+
+        onBuzzerPlayerChanged: playerSound(buzzerPlayer)
+        onPlayerJoined: playerSound(player)
+    }
+
+    function playSound(idx) {
+        var child = soundRepeater.itemAt(idx)
+        var player = child.player;
+        player.play();
+    }
+
+    Repeater {
+        id: soundRepeater
+        model: ctxGame.count
+
+        Item {
+            Component.onCompleted: {
+                console.log("player", model.index, "created")
+            }
+
+            property MediaPlayer player: MediaPlayer {
+                source: "buzz%1.mp3".arg(1 + model.index)
+            }
+        }
+    }
+
+    MediaPlayer {
+        id: failSound
+        source: "wrong-answer.mp3"
+    }
+
     StackView {
         id: root;
 
@@ -66,6 +112,10 @@ Window {
             id: questionComponent;
             QuestionDisplay {
                 id: questionDisplay;
+
+                onFailed: {
+                    failSound.play();
+                }
 
                 onComplete: {
                     ctxGame.openQuestion = null;

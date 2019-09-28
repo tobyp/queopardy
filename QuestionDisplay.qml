@@ -8,6 +8,7 @@ import "Colors.js" as C
 Rectangle {
     id: qDisplay;
 
+    signal failed
     signal complete();
     color: "lightgray"
     property var question: null;
@@ -16,11 +17,14 @@ Rectangle {
         target: ctxGame
     }
 
-    function unbuzz(compl) {
+    function unbuzz(compl, fail) {
         ctxGame.buzzerPlayer = null;
         if (compl) {
             question.revealed = true;
             complete();
+        }
+        if (fail) {
+            qDisplay.failed()
         }
     }
 
@@ -29,7 +33,7 @@ Rectangle {
     Keys.onPressed: {
         if (event.key === Qt.Key_Delete) {
             qDisplay.question.addPlayerAnswer(null, 0);
-            unbuzz(true);
+            unbuzz(true, true);
         }
         else if (event.key === Qt.Key_Escape) {
             unbuzz(ctxGame.buzzerPlayer === null);
@@ -91,14 +95,14 @@ Rectangle {
                             text: "Incorrect"
                             onClicked: {
                                 qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, -qDisplay.question.points);
-                                unbuzz(false);
+                                unbuzz(false, true);
                             }
                         }
                         Button {
                             text: "Fail"
                             onClicked: {
                                 qDisplay.question.addPlayerAnswer(null, 0);
-                                unbuzz(true);
+                                unbuzz(true, true);
                             }
                         }
                         Button {
