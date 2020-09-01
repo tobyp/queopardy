@@ -228,6 +228,29 @@ void NetworkPlayers::Private::onClientConnected()
     clients.append(client);
 }
 
+static void welcome_player(NetworkClient * client, Game * game) {
+    client->send("welcome");
+    int category_index = 0;
+    for (QObject * category_obj : game->board()->categories()) {
+        Category * category = qobject_cast<Category *>(category_obj);
+        client->send(QString("category %1 %2").arg(category_index).arg(category->label()));
+        int question_index = 0;
+        for (QObject * question_obj : category->questions()) {
+            Question * question = qobject_cast<Question *>(question_obj);
+            QString question_state = question->revealed() ? "revealed" : "hidden";
+            client->send(QString("tile %1 %2 %3 %4").arg(category_index).arg(question_index).arg(question->points()).arg(question_state));
+            int answer_index = 0;
+            for (QObject * answer_obj : question->playerAnswers()) {
+                PlayerAnswer * answer = qobject_cast<PlayerAnswer *>(answer_obj);
+                client->send(QString("answer %1 %2 %3 %4 % 5").arg(category_index).arg(question_index).arg(answer_index).arg(answer->score()).arg(answer->player()->name()));
+                answer_index++;
+            }
+            question_index++;
+        }
+        category_index++;
+    }
+}
+
 void NetworkPlayers::Private::onClientNameChanged(const QString &name)
 {
     NetworkClient *client = qobject_cast<NetworkClient *>(sender());
@@ -245,7 +268,7 @@ void NetworkPlayers::Private::onClientNameChanged(const QString &name)
             q->game()->removePlayer(client->m_player);
         }
         client->m_player = existingPlayer;
-        client->send("welcome");
+        welcome_player(client, q->game());
         emit game->playerJoined(client->m_player);
         qCDebug(logNetworkPlayers) << "Connection" << client->connectionString() << "is now controlling" << client->m_player->name();
 
@@ -253,7 +276,7 @@ void NetworkPlayers::Private::onClientNameChanged(const QString &name)
     else if (client->m_player) {  // target is self
         QString oldName = client->m_player->name();
         client->m_player->setName(name);
-        client->send("welcome");
+        welcome_player(client, q->game());
         qCDebug(logNetworkPlayers) << "Player" << oldName << "is now" << name;
 
         if (!client->m_player->property("soundPlayed").toBool()) {
@@ -266,10 +289,8 @@ void NetworkPlayers::Private::onClientNameChanged(const QString &name)
         if (newPlayer) {
             client->m_player = newPlayer;
             emit game->playerJoined(client->m_player);
-            client->send("welcome");
+            welcome_player(client, q->game());
             qCDebug(logNetworkPlayers) << "Connection" << client->connectionString() << "is now controlling" << client->m_player->name();
-
-            client->send("welcome");
         }
         else {
             client->send("error you cannot join a running game");

@@ -7,3 +7,4 @@ queopardy
 moc_*.cpp
 qrc_qml.cpp
 moc_*.h
+Makefile
