@@ -1,4 +1,5 @@
 #include "playeranswer.h"
+#include "question.h"
 
 PlayerAnswer::PlayerAnswer(QObject *parent)
     : QObject(parent), m_player(nullptr), m_score(0)
@@ -19,6 +20,11 @@ Player *PlayerAnswer::player() const
 int PlayerAnswer::score() const
 {
     return m_score;
+}
+
+Question * PlayerAnswer::question() const
+{
+    return qobject_cast<Question *>(parent());
 }
 
 void PlayerAnswer::setPlayer(Player *player)

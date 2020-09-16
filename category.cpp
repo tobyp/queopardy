@@ -15,6 +15,10 @@ QList<QObject *> Category::questions() const
     return m_questions;
 }
 
+int Category::getTileId(Question * question) const {
+    return m_questions.indexOf(question);
+}
+
 void Category::addQuestion(Question *question)
 {
     m_questions.append(question);

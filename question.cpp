@@ -1,6 +1,7 @@
 #include "player.h"
 #include "playeranswer.h"
 #include "question.h"
+#include "category.h"
 
 Question::Question(QObject *parent)
     : QObject(parent)
@@ -49,6 +50,14 @@ int Question::fontSize() const
 QList<QObject *> Question::playerAnswers() const
 {
     return m_playerAnswers;
+}
+
+Category * Question::category() const {
+    return qobject_cast<Category *>(parent());
+}
+
+int Question::getAnswerId(PlayerAnswer * answer) const {
+    return m_playerAnswers.indexOf(answer);
 }
 
 void Question::setQuestion(QString question)
@@ -105,7 +114,7 @@ void Question::setPlayerAnswers(QList<QObject *> playerAnswers)
     emit playerAnswersChanged(m_playerAnswers);
 }
 
-void Question::addPlayerAnswer(QObject *player, int score)
+PlayerAnswer * Question::addPlayerAnswer(QObject *player, int score)
 {
     Player * p = qobject_cast<Player*>(player);
     if (p) p->setScore(p->score() + score);
@@ -115,6 +124,7 @@ void Question::addPlayerAnswer(QObject *player, int score)
     connect(pa, &PlayerAnswer::scoreChanged, this, &Question::playerAnswerStateChanged);
     emit playerAnswersChanged(m_playerAnswers);
     emit questionStateChanged();
+    return pa;
 }
 
 void Question::playerAnswerStateChanged()

@@ -27,9 +27,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterUncreatableType<Player>("com.queopardy", 1, 0, "Player", "Players can only be created by Game.addPlayer");
     qmlRegisterUncreatableType<Category>("com.queopardy", 1, 0, "Category", "Categories can only be loaded");
-    qmlRegisterUncreatableType<Question>("com.queopardy", 1, 0, "Category", "Questions can only be loaded");
+    qmlRegisterUncreatableType<Question>("com.queopardy", 1, 0, "Question", "Questions can only be loaded");
     qmlRegisterUncreatableType<PlayerAnswer>("com.queopardy", 1, 0, "PlayerAnswer", "PlayerAnswers can only be created by Question.addPlayerAnswer");
-    qmlRegisterUncreatableType<Question>("com.queopardy", 1, 0, "Category", "Questions can only be loaded");
     qmlRegisterUncreatableType<Game>("com.queopardy", 1, 0, "Game", "Game is only available as the context property ctxGame");
     qmlRegisterType<NetworkPlayers>("com.queopardy", 1, 0, "NetworkPlayers");
 

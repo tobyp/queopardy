@@ -26,7 +26,7 @@ Window {
         id: gamepadManager
         target: GamepadManager
 
-        onConnectedGamepadsChanged: {
+        function onConnectedGamepadsChanged() {
             console.log("Connected gamepad changed:", GamepadManager.connectedGamepads);
 
             gamePadModel.clear();
@@ -73,8 +73,13 @@ Window {
             }
         }
 
-        onBuzzerPlayerChanged: playerSound(buzzerPlayer)
-        onPlayerJoined: playerSound(player)
+        function onBuzzerPlayerChanged(buzzerPlayer) {
+            playerSound(buzzerPlayer);
+        }
+
+        function onPlayerActiveChanged(player) {
+            if (player.active) playerSound(player);
+        }
     }
 
     function playSound(idx) {
@@ -89,7 +94,7 @@ Window {
 
         Item {
             Component.onCompleted: {
-                console.log("player", model.index, "created")
+                //console.log("Media Player created for player", model.index)
             }
 
             property MediaPlayer player: MediaPlayer {

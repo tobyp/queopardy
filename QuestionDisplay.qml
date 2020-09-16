@@ -87,21 +87,24 @@ Rectangle {
                         Button {
                             text: "Correct"
                             onClicked: {
-                                qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, qDisplay.question.points);
+                                ctxGame.resolve(qDisplay.question, ctxGame.buzzerPlayer, Game.CORRECT);
+                                //qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, qDisplay.question.points);
                                 unbuzz(true);
                             }
                         }
                         Button {
                             text: "Incorrect"
                             onClicked: {
-                                qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, -qDisplay.question.points);
+                                ctxGame.resolve(qDisplay.question, ctxGame.buzzerPlayer, Game.INCORRECT);
+                                //qDisplay.question.addPlayerAnswer(ctxGame.buzzerPlayer, -qDisplay.question.points);
                                 unbuzz(false, true);
                             }
                         }
                         Button {
                             text: "Fail"
                             onClicked: {
-                                qDisplay.question.addPlayerAnswer(null, 0);
+                                ctxGame.resolve(qDisplay.question, null, Game.FAIL);
+                                //qDisplay.question.addPlayerAnswer(null, 0);
                                 unbuzz(true, true);
                             }
                         }
@@ -115,6 +118,7 @@ Rectangle {
                             text: "Unclick"
                             onClicked: {
                                 unbuzz(true);
+                                question.revealed = false;
                             }
                         }
                     }

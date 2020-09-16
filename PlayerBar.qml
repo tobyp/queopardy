@@ -23,6 +23,13 @@ Flow {
 
             color: player.color;
 
+            MouseArea {
+                anchors.fill: parent;
+                onClicked: {
+                    ctxGame.setTurnPlayer(player);
+                }
+            }
+
             Text {
                 text: player.name + ": " + player.score;
                 color: {

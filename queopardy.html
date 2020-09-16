@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Queopardy</title>
+<style>
+* { margin: 0; padding: 0; border: 0; box-sizing: border-box; font-family: sans-serif; }
+html, body, div.slide, div.slide-content { height: 100%; width: 100%; overflow: hidden; }
+div.slide { display: none; background-color: #ccc; }
+
+div#join { display: flex; justify-content: center; }
+div#join-form-header { margin-bottom: 1.5em; }
+div#join-form-header h3 { text-align: center; }
+div#join-form { width: 30em; margin: auto; background-color: #eee; padding: 1em;}
+div#join-form form { display: grid; grid-template-columns: 0fr 3fr; column-gap: 1em; align-items: center; row-gap: 1ex;}
+div#join-form form label { grid-column: 1; text-align: right;}
+div#join-form form input { grid-column: 2; }
+div#join-form input[type="text"] { padding: 0.7ex; border-radius: 0.25ex; }
+div#join-form input[type="submit"] { padding: 0.7ex; }
+
+div#board-content { display: flex; flex-direction: column;}
+div#board { display: flex; flex-flow: row; flex-grow: 1; column-gap: 2px; }
+
+div#players { display: flex; flex-grow: 0; column-gap: 10px; }
+div.player { padding: 10px 5px; font-size: 20px; }
+span.player-name:after { content: ': '; }
+
+div.category { display: flex; flex: 1 1 0px; flex-flow: column; row-gap: 2px; }
+div.category-title { background-color: #aaa; color: white; font-size: 150%; flex-grow: 0; padding: 1ex; text-align: center; }
+div.tile { display: flex; flex: 1 1 0px; flex-flow: column; justify-content: center; align-items: center; background-color: #e2e2e2; }
+div.tile-points { font-size: 200%; }
+div.tile.revealed div.tile-points { display: none; }
+div.tile.revealed { background-color: gray; }
+div.answer { font-size: 80%; }
+span.answer-points:before { content: '['; }
+span.answer-points:after { content: ']'; }
+span.answer-player:after { content: ' '; }
+
+div#question { display: flex; flex-flow: column; justify-content: center; font-size: 250%; text-align: center; }
+div#buzzer { position: relative; left: 20%; bottom: 7em; height: 5em; width: 60%; display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 150%; }
+</style>
+<script>
+var SOCKET = null;
+
+// hexToRgb() by Tim Down
+// CC BY-SA 4.0
+// https://stackoverflow.com/a/5624139/118096
+function hexToRgb(hex) {
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
+}
+
+function join() {
+	if (SOCKET != null) return;
+
+	let server = document.querySelector('#join-form input[name="server"]').value;
+	let socket = new WebSocket(server);
+
+	socket.addEventListener('error', (e) => {
+		console.error(e);
+	});
+
+	socket.addEventListener('message', (e) => {
+		console.log(">", e.data);
+		let [cmd, ...args] = e.data.split(" ");
+		switch (cmd) {
+			case "error":
+				console.error(e.data);
+				break;
+			case "ok":
+				console.log(e.data);
+				break;
+			case "welcome": {
+				console.log("connection established!");
+				showSlide('board');
+				} break;
+			case "category": {
+				let [categoryId] = args.splice(0, 1);
+				let categoryTitle = args.join(" ");
+				addCategory(parseInt(categoryId), categoryTitle);
+				} break;
+			case "tile": {
+				let [categoryId, tileId, points, state] = args;
+				addTile(parseInt(categoryId), parseInt(tileId), parseInt(points), state);
+				} break;
+			case "answer": {
+				let [categoryId, tileId, answerId, score, playerId] = args.splice(0, 5);
+				addAnswer(parseInt(categoryId), parseInt(tileId), parseInt(answerId), parseInt(score), playerId);
+				} break;
+			case "question": {
+				let [subcmd] = args.splice(0, 1);
+				if (subcmd == "open") {
+					questionOpen(args.join(" "));
+				}
+				else if (subcmd == "closed") {
+					questionClose();
+				}
+				} break;
+			case "player": {
+				let [playerId, red, green, blue, score] = args.splice(0, 5);
+				let playerName = args.join(" ");
+
+				let playerEl = getPlayerElement(playerId);
+				if (playerEl) {
+					let nameEl = playerEl.querySelector(".player-name");
+					let scoreEl = playerEl.querySelector(".player-score");
+				}
+				else {
+					playerEl = document.createElement("div");
+					playerEl.id = "player" + playerId;
+					playerEl.classList.add("player");
+
+					let nameEl = document.createElement("span");
+					nameEl.id = "player-name" + playerId;
+					nameEl.classList.add("player-name");
+					playerEl.appendChild(nameEl);
+
+					let scoreEl = document.createElement("span");
+					scoreEl.id = "player-score" + playerId;
+					scoreEl.classList.add("player-score");
+					playerEl.appendChild(scoreEl);
+
+					let playersEl = document.querySelector('#players');
+					playersEl.appendChild(playerEl);
+				}
+
+				setPlayerColor(playerId, `rgb(${red}, ${green}, ${blue})`);
+				setPlayerName(playerId, playerName);
+				setPlayerScore(playerId, score)
+				} break;
+			case "leave": {
+					let playerId = args[0];
+					let playerEl = getPlayerElement(playerId);
+					if (playerEl) playerEl.remove();
+				} break;
+			case "buzzer": {
+				let [subcmd] = args.splice(0, 1);
+				if (subcmd == "open") {
+					buzzerHide();
+					// "buzz now"?
+				}
+				else if (subcmd == "closed") {
+					let playerId = args[0];
+					buzzerShow(playerId);
+				}
+				} break;
+		}
+	});
+
+	socket.addEventListener('open', (e) => {
+		console.log("successfully opened connection to", server);
+		SOCKET = this;
+
+		let audience = document.querySelector('#join-form input[name="audience"]').checked;
+		if (audience) {
+			socket.send("audience");
+		}
+		else {
+			let token = document.querySelector('#join-form input[name="token"]').value;
+			if (token != "") {
+				socket.send("auth " + token);
+			}
+
+			let name = document.querySelector('#join-form input[name="name"]').value;
+			socket.send("hello " + name);
+
+			let autoColor = document.querySelector('#join-form input[name="auto_color"]').checked;
+			if (!autoColor) {
+				let color = hexToRgb(document.querySelector('#join-form input[name="color"]').value);
+				socket.send(`color ${color.r} ${color.g} ${color.b}`);
+			}
+
+			document.addEventListener('keydown', (e) => {
+				if (e.code == "Space") {
+					socket.send("buzz");
+				}
+			});
+		}
+	});
+
+	socket.addEventListener('close', (e) => {
+		console.log("connection lost!");
+		SOCKET = null;
+		showSlide('join');
+		reset();
+	});
+}
+
+function clearElement(element) {
+	while(element.firstChild){
+		element.removeChild(element.firstChild);
+	}
+}
+
+function reset() {
+	clearElement(document.querySelector('#board'));
+}
+
+function showSlide(slide) {
+	document.querySelectorAll('.slide').forEach((e) => e.style.display = "none");
+	document.querySelector('#slide-' + slide).style.display = "block";
+}
+
+function getPlayerElement(playerId) {
+	return document.querySelector("#player" + playerId);
+}
+
+function getPlayerColor(playerId) {
+	if (playerId == "-1") {
+		return "gray";
+	}
+	let playerEl = getPlayerElement(playerId);
+	return playerEl.style.backgroundColor;
+}
+
+function setPlayerColor(playerId, color) {
+	let playerEl = getPlayerElement(playerId);
+	playerEl.style.backgroundColor = color;
+	document.querySelectorAll(".answer:last-child .answer-player-p" + playerId).forEach((e) => { e.parentElement.parentElement.parentElement.style.backgroundColor = color; });
+}
+
+function getPlayerName(playerId) {
+	if (playerId == "-1") {
+		return "Nobody";
+	}
+	let playerEl = getPlayerElement(playerId);
+	return playerEl.querySelector(".player-name").innerText;
+}
+
+function setPlayerName(playerId, name) {
+	let playerEl = getPlayerElement(playerId);
+	let nameEl = playerEl.querySelector('.player-name');
+	nameEl.innerText = name;
+	document.querySelectorAll(".answer-player-p" + playerId).forEach((e) => { e.innerText = name; });
+}
+
+function setPlayerScore(playerId, score) {
+	let playerEl = getPlayerElement(playerId);
+	let scoreEl = playerEl.querySelector('.player-score');
+	scoreEl.innerText = score;
+}
+
+function questionOpen(question) {
+	document.querySelector("#question-text").innerText = question;
+	showSlide('question');
+}
+
+function questionClose() {
+	showSlide('board');
+}
+
+function buzzerShow(playerId) {
+	let playerName = getPlayerName(playerId);
+	let playerColor = getPlayerColor(playerId);
+	document.querySelector('#buzzer-player').innerText = playerName;
+	let buzzerEl = document.querySelector('#buzzer');
+	buzzerEl.style.backgroundColor = playerColor;
+	buzzerEl.style.display = "flex";
+}
+
+function buzzerHide() {
+	document.querySelector('#buzzer').style.display = "none";
+}
+
+function addCategory(categoryId, categoryTitle) {
+	let categoryEl = document.createElement("div");
+	categoryEl.classList.add("category");
+	categoryEl.id = "cat" + categoryId;
+
+	let titleEl = document.createElement("div");
+	titleEl.classList.add("category-title");
+	titleEl.innerText = categoryTitle;
+	categoryEl.appendChild(titleEl);
+
+	let boardEl = document.querySelector("#board");
+	boardEl.appendChild(categoryEl);
+}
+
+function addTile(categoryId, tileId, points, state) {
+	let tileCssId = "cat" + categoryId + "-tile" + tileId;
+	let tileEl = document.querySelector("#" + tileCssId);
+	let pointsEl = null;
+	if (!tileEl) {
+		tileEl = document.createElement("div");
+		tileEl.classList.add("tile");
+		tileEl.id = tileCssId;
+
+		pointsEl = document.createElement("div");
+		pointsEl.classList.add("tile-points");
+
+		let answersEl = document.createElement("div");
+		answersEl.classList.add("tile-answers");
+
+		tileEl.appendChild(pointsEl);
+		tileEl.appendChild(answersEl);
+
+		categoryEl = document.querySelector("#cat" + categoryId);
+		categoryEl.appendChild(tileEl);
+	}
+	else {
+		pointsEl = tileEl.querySelector(".tile-points");
+	}
+
+	tileEl.classList.toggle("revealed", state == "revealed");
+	pointsEl.innerText = points;
+}
+
+function addAnswer(categoryId, tileId, answerId, score, playerId) {
+	let answerEl = document.createElement("div");
+	answerEl.classList.add("answer");
+	answerEl.id = "cat" + categoryId + "-tile" + tileId + "-ans" + answerId;
+
+	let playerEl = document.createElement("span");
+	playerEl.classList.add("answer-player");
+	playerEl.classList.add("answer-player-p" + playerId);
+	playerEl.innerText = getPlayerName(playerId);
+	answerEl.appendChild(playerEl);
+
+	if (playerId != "-1") {
+		let pointsEl = document.createElement("span");
+		pointsEl.classList.add("answer-points");
+		pointsEl.innerText = score;
+		answerEl.appendChild(pointsEl);
+	}
+
+	let tileEl = document.querySelector("#cat" + categoryId + "-tile" + tileId);
+	tileEl.classList.toggle("revealed", true);
+
+	let tileAnswersEl = tileEl.querySelector(".tile-answers");
+	tileAnswersEl.appendChild(answerEl);
+
+	if (playerId !== "-1") {
+		tileEl.style.backgroundColor = getPlayerColor(playerId);
+	}
+	else {
+		tileEl.style.backgroundColor = "gray";
+	}
+}
+
+function toggleAutoColor() {
+	let colorCtrl = document.querySelector('#join-form input[name="color"]');
+	let autoColorCtrl = document.querySelector('#join-form input[name="auto_color"]');
+	colorCtrl.disabled = autoColorCtrl.checked;
+}
+
+function toggleAudience() {
+	let audienceCtrl = document.querySelector('#join-form input[name="audience"]');
+	if (audienceCtrl.checked) {
+		document.querySelectorAll('input.player_only').forEach((e) => { e.disabled = true; });
+	}
+	else {
+		document.querySelectorAll('input.player_only').forEach((e) => { e.disabled = false; });
+		let colorCtrl = document.querySelector('#join-form input[name="color"]');
+		let autoColorCtrl = document.querySelector('#join-form input[name="auto_color"]');
+		colorCtrl.disabled = autoColorCtrl.checked;
+	}
+}
+
+function load() {
+	showSlide("join");
+}
+
+</script>
+</head>
+<body onload="load()">
+<div class="slide" id="slide-join">
+	<div id="join" class="slide-content">
+		<div id="join-form">
+			<div id="join-form-header">
+				<h3>Wilkommen beim Hacker-Jeopardy der Hackerkiste 2020!</h3>
+				<p>Mitspieler bekommen vom Spielleiter ein Token und melden sich damit an.</p>
+				<p>Nichtspieler können als Zuschauer beitreten.</p>
+			</div>
+			<form action="" onsubmit="return false;">
+				<label for="audience">Zuschauer</label> <input type="checkbox" name="audience" checked="checked" onchange="toggleAudience();" />
+				<label for="name">Name</label> <input class="player_only" type="text" name="name" placeholder="Name" disabled="true"/>
+				<label for="color">Color</label> <span><input class="player_only" type="color" name="color" disabled="true"/> <label for="auto_color">Automatic</label> <input class="player_only" type="checkbox" name="auto_color" checked="checked" onchange="toggleAutoColor();" /></span>
+				<label for="server">Server</label> <input class="player_only" type="text" name="server" value="wss://jeopardy.tobyp.net:31337/jeopardy" disabled="true" />
+				<label for="token">Token</label> <input class="player_only" type="text" name="token" placeholder="Token" disabled="true"/>
+				<input type="submit" value="Join" onclick="join();"/>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="slide" id="slide-board">
+	<div id="board-content" class="slide-content">
+		<div id="board"></div>
+		<div id="players"></div>
+	</div>
+</div>
+<div class="slide" id="slide-question">
+	<div id="question" class="slide-content">
+		<span id="question-text"></span>
+	</div>
+	<div id="buzzer">
+		<span id="buzzer-player"></span>
+	</div>
+</div>
+</body>
+</html>

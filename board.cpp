@@ -47,7 +47,7 @@ void Board::loadJson(const QJsonArray &catArray, Game *game)
 
             lastScore = questionObject.value("points").toInt(lastScore + 100);
             QString questionString = questionObject.value("question").toString();
-            Question * question = new Question(lastScore, questionString);
+            Question * question = new Question(lastScore, questionString, cat);
             connect(question, &Question::questionStateChanged, this, &Board::questionStateChanged);
 
             bool revealed = questionObject.value("revealed").toBool();

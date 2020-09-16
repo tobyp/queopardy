@@ -1,0 +1,9 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"file_exclude_patterns": ["board.*.json", ".qmake.stash", "moc_*.cpp", "*.moc"]
+		}
+	]
+}

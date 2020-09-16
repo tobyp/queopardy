@@ -51,5 +51,11 @@
 				{"points": 500, "question": "💩", "answer": "Answer", "font": "board-allgemein/NotoColorEmoji.ttf", "fontSize": 100}
 			]
 		}
-	]
+	],
+	"players": [
+		{"name": "Alice", "token": "token", "color": {"red": 255, "green": 0, "blue": 0}},
+		{"name": "Bob", "token": "token2", "color": {"red": 0, "green": 255, "blue": 0}},
+		{"name": "Charlie", "token": "token3", "color": {"red": 0, "green": 0, "blue": 255}}
+	],
+	"joinable": false
 }

@@ -5,6 +5,8 @@
 
 #include "playeranswer.h"
 
+class Category;
+
 class Question : public QObject
 {
     Q_OBJECT
@@ -21,47 +23,32 @@ public:
     explicit Question(int points, QString const& question, QObject *parent = nullptr);
 
     QString question() const;
-
     int points() const;
-
     bool revealed() const;
-
     QString font() const;
-
     int fontSize() const;
-
     QList<QObject*> playerAnswers() const;
+
+    int getAnswerId(PlayerAnswer * answer) const;
+    Category * category() const;
 
 signals:
     void questionChanged(QString question);
-
     void pointsChanged(int points);
-
     void revealedChanged(bool revealed);
-
     void fontChanged(QString font);
-
     void fontSizeChanged(int fontSize);
-
     void playerAnswersChanged(QList<QObject*> playerAnswers);
-
     void questionStateChanged();
 
 public slots:
     void setQuestion(QString question);
-
     void setPoints(int points);
-
     void setRevealed(bool revealed);
-
     void setFont(QString font);
-
     void setFontSize(int fontSize);
-
     void setPlayerAnswers(QList<QObject*> playerAnswers);
-
-    void addPlayerAnswer(QObject * player, int score);
-
+    PlayerAnswer * addPlayerAnswer(QObject * player, int score);
     void playerAnswerStateChanged();
 
 private:

@@ -1,5 +1,7 @@
 QT += quick gamepad network websockets multimedia
-CONFIG += c++14
+CONFIG += c++14 debub
+
+QMAKE_CXXFLAGS_DEBUG += -ggdb
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

@@ -5,13 +5,19 @@ Player::Player(QObject *parent) : QObject(parent)
 
 }
 
-Player::Player(const QString &name, const QColor &color, QObject *parent)
+Player::Player(int id, const QString &name, const QColor &color, QObject *parent)
     : QObject(parent)
+    , m_id(id)
     , m_name(name)
     , m_color(color)
     , m_score(0)
 {
 
+}
+
+int Player::id() const
+{
+    return m_id;
 }
 
 QString Player::name() const
@@ -34,7 +40,29 @@ int Player::key() const
     return m_key;
 }
 
-void Player::setName(QString name)
+bool Player::active() const
+{
+    return m_active;
+}
+
+QString Player::token() const {
+    return m_token;
+}
+
+void Player::setToken(QString const& token) {
+    m_token = token;
+}
+
+void Player::setId(int id)
+{
+    if (m_id == id)
+        return;
+
+    m_id = id;
+    emit idChanged(m_id);
+}
+
+void Player::setName(QString const& name)
 {
     if (m_name == name)
         return;
@@ -43,7 +71,7 @@ void Player::setName(QString name)
     emit nameChanged(m_name);
 }
 
-void Player::setColor(QColor color)
+void Player::setColor(QColor const& color)
 {
     if (m_color == color)
         return;
@@ -68,4 +96,13 @@ void Player::setKey(int key)
 
     m_key = key;
     emit keyChanged(m_key);
+}
+
+void Player::setActive(bool active)
+{
+    if (m_active == active)
+        return;
+
+    m_active = active;
+    emit activeChanged(m_active);
 }

@@ -19,12 +19,12 @@ public:
     QString label() const;
 
     QList<QObject*> questions() const;
+    int getTileId(Question * question) const;
 
     void addQuestion(Question * question);
 
 signals:
     void labelChanged(QString label);
-
     void questionsChanged(QList<QObject*> questions);
 
 public slots:

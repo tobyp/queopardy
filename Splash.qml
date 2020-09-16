@@ -17,7 +17,7 @@ Rectangle {
         if (txtPlayerName.text == "")
             return;
 
-        root.game.addPlayer(txtPlayerName.text, colPlayerColor.color);
+        root.game.addPlayer(game.nextFreePlayerId(), txtPlayerName.text, colPlayerColor.color);
 
         txtPlayerName.clear();
         colPlayerColor.advanceColor();
@@ -33,7 +33,6 @@ Rectangle {
 
             ColumnLayout {
                 anchors.fill: parent;
-                Layout.alignment: Qt.AlignCenter
                 spacing: 2;
 
                 Text {
@@ -53,7 +52,7 @@ Rectangle {
                             id: playerText
                             Layout.fillWidth: true;
                             Layout.alignment: Qt.AlignVCenter;
-                            text: model.name;
+                            text: model.name + (model.active ? "" : " (inactive)");
 
                             font.pointSize: playerBuzzer.anyButton ? 30 : 14
 
@@ -67,6 +66,7 @@ Rectangle {
                             width: btn.height;
                             height: btn.height;
                             color: model.color;
+
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
