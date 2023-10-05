@@ -1,6 +1,7 @@
 import QtQuick 2.13
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.5
+import QtGamepad 1.13
 import com.queopardy 1.0;
 import "Colors.js" as Colors;
 
@@ -52,13 +53,13 @@ Rectangle {
                             id: playerText
                             Layout.fillWidth: true;
                             Layout.alignment: Qt.AlignVCenter;
-                            text: model.name + (model.active ? "" : " (inactive)");
+                            text: model.name; // + (model.active ? "" : " (inactive)");
 
                             font.pointSize: playerBuzzer.anyButton ? 30 : 14
 
                             GamepadBuzzer {
                                 id: playerBuzzer
-                                deviceId: model.index
+                                deviceId: GamepadManager.connectedGamepads[model.index]
                             }
                         }
 

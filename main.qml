@@ -22,9 +22,38 @@ Window {
         game: ctxGame
     }
 
+    function configureGamepad(deviceId) {
+        GamepadManager.configureButton(deviceId, GamepadManager.ButtonX)
+        GamepadManager.configureButton(deviceId, GamepadManager.ButtonY)
+        GamepadManager.configureButton(deviceId, GamepadManager.ButtonA)
+        GamepadManager.configureButton(deviceId, GamepadManager.ButtonB)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonR1)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonR2)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonL1)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonL2)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonDown)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonLeft)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonRight)
+        // GamepadManager.configureButton(deviceId, GamepadManager.ButtonUp)
+    }
+
     Connections {
         id: gamepadManager
         target: GamepadManager
+
+        Component.onCompleted: {
+            console.log("Initial connected gamepads:", GamepadManager.connectedGamepads);
+
+            gamePadModel.clear();
+
+            for(var i in GamepadManager.connectedGamepads) {
+                var deviceId = GamepadManager.connectedGamepads[i];
+
+                gamePadModel.append({"deviceId": deviceId});
+
+                configureGamepad(deviceId)
+            }
+        }
 
         function onConnectedGamepadsChanged() {
             console.log("Connected gamepad changed:", GamepadManager.connectedGamepads);
@@ -35,6 +64,8 @@ Window {
                 var deviceId = GamepadManager.connectedGamepads[i];
 
                 gamePadModel.append({"deviceId": deviceId});
+
+                configureGamepad(deviceId)
             }
         }
     }
@@ -49,7 +80,8 @@ Window {
                 deviceId: model.deviceId
 
                 onBuzzed: {
-                    var player = ctxGame.get(deviceId);
+                    var playerIdx = GamepadManager.connectedGamepads.indexOf(deviceId);
+                    var player = ctxGame.get(playerIdx);
                     if (player) {
                         console.log("Name", name, "buzzered player", player.name);
 

@@ -7,17 +7,22 @@ import com.queopardy 1.0
 
 Gamepad {
     signal buzzed
-    
-    function buzzGamepad(button) {
-        if (button) {
+
+    function buzzGamepad(button, state) {
+        // console.log("Button", button, state)
+        if (state) {
             buzzed();
         }
     }
 
-    property bool anyButton: buttonA || buttonB || buttonX || buttonY
+    property bool anyButton: buttonA || buttonB || buttonX || buttonY  // || buttonL1 || buttonL2 || buttonR1 || buttonR2
 
-    onButtonAChanged: buzzGamepad(buttonA)
-    onButtonBChanged: buzzGamepad(buttonB)
-    onButtonXChanged: buzzGamepad(buttonX)
-    onButtonYChanged: buzzGamepad(buttonY)
+    onButtonAChanged: buzzGamepad("A", buttonA)
+    onButtonBChanged: buzzGamepad("B", buttonB)
+    onButtonXChanged: buzzGamepad("X", buttonX)
+    onButtonYChanged: buzzGamepad("Y", buttonY)
+    // onButtonL1Changed: buzzGamepad("L1", buttonL1)
+    // onButtonL2Changed: buzzGamepad("L2", buttonL2)
+    // onButtonR1Changed: buzzGamepad("R1", buttonR1)
+    // onButtonR2Changed: buzzGamepad("R2", buttonR2)
 }
